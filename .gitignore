@@ -61,3 +61,6 @@ coverage/
 .turbo/
 .vercel/
 .netlify/
+
+# Answer key (uncomment ถ้าไม่ต้องการให้นักเรียนเห็นเฉลย)
+# src/App.answer.tsx
