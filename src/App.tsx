@@ -65,19 +65,21 @@ function App() {
   // TODO 8: สร้างฟังก์ชัน toggleTodo สำหรับเปลี่ยนสถานะ completed
   // Hint: ใช้ map เพื่อหา todo ที่ตรงกับ id และ toggle completed
   const toggleTodo = (id: number) => {
-    // เติม code ที่นี่
+    setTodos(todos.map(todo =>
+      todo.id === id ? {...todo, completed: !todo.completed} : todo
+    ))
   }
 
   // TODO 9: สร้างฟังก์ชัน deleteTodo สำหรับลบรายการ
   // Hint: ใช้ filter เพื่อเอา todo ที่ไม่ตรงกับ id ออก
   const deleteTodo = (id: number) => {
-    // เติม code ที่นี่
+    setTodos(todos.filter(todo => todo.id !== id))
   }
 
   // TODO 10: สร้างฟังก์ชัน clearCompleted สำหรับลบรายการที่เสร็จแล้วทั้งหมด
   // Hint: ใช้ filter เพื่อเอาเฉพาะ todo ที่ยังไม่ completed
   const clearCompleted = () => {
-    // เติม code ที่นี่
+    setTodos(todos.filter(todo => !todo.completed))
   }
 
   // TODO 11: กรอง todos ตาม filter ปัจจุบัน
@@ -85,7 +87,8 @@ function App() {
   //       ถ้า filter เป็น 'completed' ให้แสดงเฉพาะที่ completed แล้ว
   //       ถ้าเป็น 'all' ให้แสดงทั้งหมด
   const filteredTodos = todos.filter(todo => {
-    // เติม code ที่นี่
+    if (filter === 'active') return !todo.completed
+    if (filter === 'completed') return todo.completed
     return true // แก้ไขให้ถูกต้อง
   })
 
@@ -155,23 +158,26 @@ function App() {
           // Hint: ต้องใส่ key prop และใช้ todo.id
           filteredTodos.map((todo, index) => (
             <li 
-              // key={/* เติม unique key */} 
-              // className={`todo-item ${todo.completed ? 'completed' : ''}`}
-              // style={{ animationDelay: `${index * 0.05}s` }}
+              key={todo.id} 
+              className={`todo-item ${todo.completed ? 'completed' : ''}`}
+              style={{ animationDelay: `${index * 0.05}s` }}
             >
               <label className="checkbox-container">
                 {/* TODO 19: สร้าง checkbox สำหรับ toggle */}
                 <input
-                  // สร้าง checkbox สำหรับ toggle
-                  // state ของ todo
+                  type='checkbox'
+                  checked={todo.completed}
+                  onChange={() => toggleTodo(todo.id)}
                 />
                 <span className="checkmark"></span>
               </label>
               {/* TODO 20: แสดงข้อความของ todo */}
-              <span className="todo-text">{/* เติม todo text */}</span>
+              <span className="todo-text">{todo.text}</span>
               {/* TODO 21: สร้างปุ่มลบ */}
               <button 
-                // เติมการเรียก deleteTodo
+                className="delete-btn"
+                onClick={() => deleteTodo(todo.id)}
+                aria-label="ลบรายการ"
               >
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6"/>
@@ -185,6 +191,12 @@ function App() {
       {/* TODO 22: แสดงปุ่ม clear completed เมื่อมีรายการที่เสร็จแล้ว */}
       {/* Hint: ใช้ conditional rendering ตรวจสอบ completedCount > 0 */}
       {/* เติม conditional rendering ที่นี่ */}
+      {completedCount > 0 &&(
+        <div className="todo-footer">
+          <button className="clear-btn" onClick={clearCompleted}>ล้างรายการที่เสร็จแล้ว ({completedCount})</button>
+          
+        </div>
+      )}
     </div>
   )
 }
