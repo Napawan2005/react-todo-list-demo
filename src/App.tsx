@@ -12,7 +12,10 @@ import './App.css'
 // Hint: Todo ควรมี property: id (number), text (string), 
 //       completed (boolean), createdAt (string)
 interface Todo {
-  // เติม properties ที่นี่
+  id: number
+  text: string
+  completed: boolean
+  createdAt: string
 }
 
 // TODO 2: สร้าง Type สำหรับ Filter
