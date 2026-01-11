@@ -20,16 +20,19 @@ interface Todo {
 
 // TODO 2: สร้าง Type สำหรับ Filter
 // Hint: FilterType ควรเป็น 'all' | 'active' | 'completed'
-type FilterType = '' // แก้ไขให้ถูกต้อง
+type FilterType = 'all' | 'active' | 'completed'// แก้ไขให้ถูกต้อง
 
 function App() {
   // TODO 3: สร้าง State สำหรับเก็บรายการ todos
   // Hint: ใช้ useState<Todo[]> และโหลดข้อมูลจาก localStorage
-  const [todos, setTodos] = useState<Todo[]>([])
+  const [todos, setTodos] = useState<Todo[]>(() => {
+    const saved = localStorage.getItem("todos")
+    return saved ? JSON.parse(saved) : []
+  })
 
   // TODO 4: สร้าง State สำหรับเก็บค่า input
   // Hint: ใช้ useState<string> เริ่มต้นเป็น string ว่าง
-  const [inputValue, setInputValue] = useState(/* เติมค่าเริ่มต้น */)
+  const [inputValue, setInputValue] = useState<string>("hello worlds")
 
   // TODO 5: สร้าง State สำหรับเก็บ filter ปัจจุบัน
   // Hint: ใช้ useState<FilterType> เริ่มต้นเป็น 'all'
@@ -45,7 +48,18 @@ function App() {
   // Hint: ต้อง preventDefault, ตรวจสอบ inputValue ไม่ว่าง, 
   //       สร้าง newTodo object, อัพเดท todos, และ clear input
   const addTodo = (e: FormEvent<HTMLFormElement>) => {
-    // เติม code ที่นี่
+    e.preventDefault() // ป้องการ user ไม่กรอกข้อมูลแล้ว submit form
+    if(inputValue.trim() === '') return // ตรวจสอบ inputValue ไม่ว่าง ถ้าว่างจะไม่ทำงานต่อ
+
+    const newTodo: Todo = {
+      id : Date.now(), // สร้าง id แบบง่ายๆ ด้วย timestamp
+      text : inputValue.trim(),
+      completed : false,
+      createdAt : new Date().toISOString()
+    }
+
+    setTodos([newTodo, ...todos]) 
+    setInputValue("") // อัพเดท todos โดยเพิ่ม newTodo เข้าไปข้างหน้า
   }
 
   // TODO 8: สร้างฟังก์ชัน toggleTodo สำหรับเปลี่ยนสถานะ completed
@@ -77,22 +91,27 @@ function App() {
 
   // TODO 12: นับจำนวน todo ที่เสร็จแล้วและยังไม่เสร็จ
   // Hint: ใช้ filter และ .length
-  const completedCount = 0 // แก้ไขให้ถูกต้อง
-  const activeCount = 0 // แก้ไขให้ถูกต้อง
+  const completedCount = filteredTodos.filter(todo => todo.completed).length
+  const activeCount = todos.length - completedCount
 
   return (
     <div className="todo-container">
       <header className="todo-header">
         {/* TODO 13: เติมข้อความ header */}
-        <h1>{/* เติมหัวข้อ */}</h1>
-        <p className="subtitle">{/* เติม subtitle */}</p>
+        <h1>รายการสิ่งที่ต้องทำ</h1>
+        <p className="subtitle">จัดการงานของคุณอย่างเป็นระบบ</p>
       </header>
 
       {/* TODO 14: สร้าง form สำหรับเพิ่ม todo */}
       {<form onSubmit={addTodo} className="todo-form">
         <input
-          // สร้าง input สำหรับเพิ่ม todo
+          type ="text"
+          value={inputValue}
+          onChange={(e) =>  setInputValue(e.target.value)}//ใช้แค่ครั้งเดียวในบรรทัดนั้น รับหน้าที่รับข้อความจาก input
+          placeholder="เพิ่มสิ่งที่ต้องทำใหม่..."
+          className='todo-input'
         />
+        {/* input สำหรับกรอกข้อความ todo */}
         <button type="submit" className="add-btn">
           <span className="btn-icon">+</span>
           <span className="btn-text">เพิ่ม</span>
@@ -102,6 +121,21 @@ function App() {
       {/* TODO 15: สร้างปุ่ม filter */}
       <div className="filter-tabs">
         {/* สร้างปุ่ม filter */}
+        <button
+          className = {`filter-btn ${filter === 'all' ? 'active' : ''}`}
+          onClick={() => setFilter('all')}>{/*fn ที่กระทำกับปุ่ม*/}
+          ทั้งหมด {(todos.length)}
+        </button>
+        <button
+          className = {`filter-btn ${filter === 'active' ? 'active' : ''}`}
+          onClick={() => setFilter('active')}>{/*fn ที่กระทำกับปุ่ม*/}
+          ยังไม่เสร็จ {(activeCount)}
+        </button>
+        <button
+          className = {`filter-btn ${filter === 'completed' ? 'active' : ''}`}
+          onClick={() => setFilter('completed')}>
+          เสร็จแล้ว {(completedCount)}
+        </button>
       </div>
 
       {/* TODO 16: แสดงรายการ todos */}
@@ -111,7 +145,9 @@ function App() {
           <li className="empty-state">
             <div className="empty-icon">📝</div>
             <p>
-              {/* TODO 17: แสดงข้อความตาม filter */}
+              {filter === 'all' && 'ไม่มีรายการสิ่งที่ต้องทำ'}
+              {filter === 'active' && 'ไม่มีรายการสิ่งที่ยังไม่เสร็จ'}
+              {filter === 'completed' && 'ไม่มีรายการสิ่งที่เสร็จแล้ว'}
             </p>
           </li>
         ) : (
